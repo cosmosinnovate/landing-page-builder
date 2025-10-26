@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:4.4
+    container_name: landing-page-builder-mongodb
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: landing_page_builder
+    volumes:
+      - mongodb_data:/data/db
+      - ./docker/mongo-init:/docker-entrypoint-initdb.d
+    networks:
+      - landing-page-builder-network
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: landing-page-builder-mongo-express
+    depends_on:
+      - mongodb
+    ports:
+      - "8083:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb:27017/
+      ME_CONFIG_BASICAUTH: false
+    networks:
+      - landing-page-builder-network
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: landing-page-builder-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - landing-page-builder-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+
+networks:
+  landing-page-builder-network:
+    driver: bridge
