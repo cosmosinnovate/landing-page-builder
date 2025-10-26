@@ -89,6 +89,22 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(errorResponse)
     }
 
+    @ExceptionHandler(PageNotFoundException::class)
+    fun handlePageNotFound(
+        ex: PageNotFoundException,
+        request: WebRequest,
+    ): ResponseEntity<ErrorResponse> {
+        val errorResponse =
+            ErrorResponse(
+                timestamp = LocalDateTime.now(),
+                status = HttpStatus.NOT_FOUND.value(),
+                error = "Page Not Found",
+                message = ex.message ?: "Page not found",
+                path = request.getDescription(false).removePrefix("uri="),
+            )
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse)
+    }
+
     @ExceptionHandler(Exception::class)
     fun handleGenericException(
         ex: Exception,
