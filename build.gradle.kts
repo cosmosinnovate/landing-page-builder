@@ -31,7 +31,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
 
     // OpenAPI/Swagger
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 	
     // Kotlin specific
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -51,6 +51,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mongodb")
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("com.ninja-squad:springmockk:4.0.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
