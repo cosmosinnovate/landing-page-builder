@@ -105,6 +105,38 @@ class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse)
     }
 
+    @ExceptionHandler(PageSlugConflictException::class)
+    fun handlePageSlugConflict(
+        ex: PageSlugConflictException,
+        request: WebRequest,
+    ): ResponseEntity<ErrorResponse> {
+        val errorResponse =
+            ErrorResponse(
+                timestamp = LocalDateTime.now(),
+                status = HttpStatus.CONFLICT.value(),
+                error = "Slug Conflict",
+                message = ex.message ?: "Page slug already exists",
+                path = request.getDescription(false).removePrefix("uri="),
+            )
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse)
+    }
+
+    @ExceptionHandler(InvalidPageException::class)
+    fun handleInvalidPage(
+        ex: InvalidPageException,
+        request: WebRequest,
+    ): ResponseEntity<ErrorResponse> {
+        val errorResponse =
+            ErrorResponse(
+                timestamp = LocalDateTime.now(),
+                status = HttpStatus.BAD_REQUEST.value(),
+                error = "Invalid Page",
+                message = ex.message ?: "Invalid page data",
+                path = request.getDescription(false).removePrefix("uri="),
+            )
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse)
+    }
+
     @ExceptionHandler(Exception::class)
     fun handleGenericException(
         ex: Exception,
