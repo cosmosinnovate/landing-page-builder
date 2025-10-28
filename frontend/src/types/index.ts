@@ -202,7 +202,13 @@ export interface CreatePageRequest {
   seoSettings?: SeoSettings;
 }
 
-export interface UpdatePageRequest extends CreatePageRequest {
-  id: string;
+export interface UpdatePageRequest {
+  slug: string;
+  title: string;
+  metaDescription?: string;
+  metaKeywords?: string;
+  status?: PageStatus;
+  content?: PageContent;
+  seoSettings?: SeoSettings;
 }
 

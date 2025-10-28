@@ -136,7 +136,7 @@ const PageEditor: React.FC = () => {
           seoSettings: page.seoSettings,
         };
         console.log('Update data:', updateData);
-        const updated = await apiClient.updatePage(page.id, { id: page.id, ...updateData });
+        const updated = await apiClient.updatePage(page.id, updateData);
         setPage(updated);
         toast.success('Page saved successfully');
       } else {
