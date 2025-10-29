@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Landing Page Builder - Development Start Script
+# Landing Page Builder - Development Start Script (With Docker Logs)
 
-echo "🚀 Starting Landing Page Builder..."
+echo "🚀 Starting Landing Page Builder (with Docker logs)..."
 echo ""
 
 # Cleanup function
@@ -16,6 +16,9 @@ cleanup() {
     if [ ! -z "$FRONTEND_PID" ]; then
         kill $FRONTEND_PID 2>/dev/null
         echo "   ✓ Frontend stopped"
+    fi
+    if [ ! -z "$DOCKER_PID" ]; then
+        kill $DOCKER_PID 2>/dev/null
     fi
     docker-compose down
     echo "   ✓ Docker containers stopped"
@@ -48,6 +51,10 @@ else
     echo "❌ Failed to start services"
     exit 1
 fi
+
+# Start following docker logs in background
+docker-compose logs -f > docker.log 2>&1 &
+DOCKER_PID=$!
 
 echo ""
 echo "🔧 Starting Backend..."
@@ -105,10 +112,10 @@ echo "   - Swagger:  http://localhost:8082/swagger-ui.html"
 echo "   - MongoDB:  localhost:27018"
 echo "   - Redis:    localhost:6379"
 echo ""
-echo "📋 Showing live logs (Press Ctrl+C to stop all services)..."
+echo "📋 Showing live logs from all services (Press Ctrl+C to stop)..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-# Follow all logs simultaneously
-tail -f backend.log frontend.log
+# Follow all logs simultaneously including Docker
+tail -f docker.log backend.log frontend.log
 

@@ -48,19 +48,3 @@ class TenantResourceLimitException(
     message: String,
     cause: Throwable? = null,
 ) : TenantException(message, cause)
-
-/**
- * Base exception for all page-related errors
- */
-abstract class PageException(
-    message: String,
-    cause: Throwable? = null,
-) : RuntimeException(message, cause)
-
-/**
- * Thrown when a page is not found
- */
-class PageNotFoundException(
-    message: String,
-    cause: Throwable? = null,
-) : PageException(message, cause)

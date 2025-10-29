@@ -5,8 +5,11 @@ Quick reference for common development tasks.
 ## 🚀 Getting Started
 
 ```bash
-# Quick start (runs everything)
+# Quick start with live logs (recommended)
 ./start-dev.sh
+
+# Quick start with Docker logs included
+./start-dev-with-docker-logs.sh
 
 # Or manually:
 docker-compose up -d        # Start MongoDB & Redis
