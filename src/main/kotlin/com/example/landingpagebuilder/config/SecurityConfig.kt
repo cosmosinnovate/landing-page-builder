@@ -1,6 +1,8 @@
 package com.example.landingpagebuilder.config
 
+import com.example.landingpagebuilder.security.CustomAccessDeniedHandler
 import com.example.landingpagebuilder.security.JwtAuthenticationFilter
+import jakarta.annotation.PostConstruct
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -10,6 +12,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
@@ -23,18 +26,27 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableMethodSecurity
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val customAccessDeniedHandler: CustomAccessDeniedHandler,
 ) {
+    @PostConstruct
+    fun init() {
+        // Enable SecurityContext propagation for async/coroutine contexts
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL)
+    }
+
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain =
         http
             .csrf { it.disable() }
             .cors { it.configurationSource(corsConfigurationSource()) }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .exceptionHandling { it.accessDeniedHandler(customAccessDeniedHandler) }
             .authorizeHttpRequests { auth ->
                 auth
                     // Public endpoints
                     .requestMatchers("/api/v1/auth/**").permitAll()
                     .requestMatchers("/public/**").permitAll()
+                    .requestMatchers("/error").permitAll()
                     .requestMatchers("/api-docs/**").permitAll()
                     .requestMatchers("/swagger-ui/**").permitAll()
                     .requestMatchers("/swagger-ui.html").permitAll()

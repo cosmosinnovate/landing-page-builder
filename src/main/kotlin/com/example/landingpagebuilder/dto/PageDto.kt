@@ -1,6 +1,5 @@
 package com.example.landingpagebuilder.dto
 
-import com.example.landingpagebuilder.domain.model.DesignSettings
 import com.example.landingpagebuilder.domain.model.PageContent
 import com.example.landingpagebuilder.domain.model.PageStatus
 import com.example.landingpagebuilder.domain.model.SeoSettings
@@ -49,4 +48,3 @@ data class UpdatePageRequest(
     @Schema(description = "SEO settings")
     val seoSettings: SeoSettings = SeoSettings(),
 )
-

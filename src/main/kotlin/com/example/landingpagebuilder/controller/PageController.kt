@@ -208,4 +208,3 @@ class PageController(
         return ResponseEntity.ok(mapOf("available" to isAvailable))
     }
 }
-

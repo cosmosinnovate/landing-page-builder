@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { apiClient } from '@/services/api';
 import type { User, AuthResponse, LoginRequest, SignupRequest } from '@/types';
 import toast from 'react-hot-toast';
+import { debugToken, isTokenExpired } from '@/utils/jwt';
 
 interface AuthContextType {
   user: User | null;
@@ -37,8 +38,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     if (accessToken && userStr) {
       try {
-        const savedUser = JSON.parse(userStr);
-        setUser(savedUser);
+        // Debug token to see what's inside
+        debugToken(accessToken, 'Access Token');
+
+        // Check if token is expired
+        if (isTokenExpired(accessToken)) {
+          console.warn('Access token is expired');
+          localStorage.removeItem('user');
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+        } else {
+          const savedUser = JSON.parse(userStr);
+          console.log('Loaded user from localStorage:', savedUser);
+          setUser(savedUser);
+        }
       } catch (error) {
         console.error('Failed to parse user from localStorage', error);
         localStorage.removeItem('user');
@@ -51,6 +64,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const saveAuthData = (authResponse: AuthResponse) => {
+    console.log('Saving auth data:', authResponse.user);
+    debugToken(authResponse.accessToken, 'New Access Token');
+    
     localStorage.setItem('accessToken', authResponse.accessToken);
     localStorage.setItem('refreshToken', authResponse.refreshToken);
     localStorage.setItem('user', JSON.stringify(authResponse.user));

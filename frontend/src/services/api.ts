@@ -46,6 +46,31 @@ class ApiClient {
       async (error: AxiosError) => {
         const originalRequest = error.config as any;
 
+        // Handle 403 Forbidden errors
+        if (error.response?.status === 403) {
+          console.error('403 Forbidden Error:', {
+            url: originalRequest?.url,
+            method: originalRequest?.method,
+            headers: originalRequest?.headers,
+          });
+          
+          // Check if user has proper role
+          const token = localStorage.getItem('accessToken');
+          if (token) {
+            try {
+              const payload = JSON.parse(atob(token.split('.')[1]));
+              console.error('Token payload:', payload);
+              console.error('User role:', payload.role);
+              
+              if (!payload.role) {
+                console.error('⚠️ Token is missing role claim! Please log out and log back in.');
+              }
+            } catch (e) {
+              console.error('Failed to decode token:', e);
+            }
+          }
+        }
+
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
 
@@ -59,6 +84,7 @@ class ApiClient {
             // Refresh failed, redirect to login
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
             window.location.href = '/login';
             return Promise.reject(refreshError);
           }
