@@ -1,9 +1,11 @@
 package com.example.landingpagebuilder.config
 
+import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.info.License
+import io.swagger.v3.oas.models.security.SecurityScheme
 import io.swagger.v3.oas.models.servers.Server
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -28,6 +30,17 @@ class OpenApiConfig {
                         .description("Production Server"),
                 ),
             )
+            .components(
+                Components()
+                    .addSecuritySchemes(
+                        "Bearer Authentication",
+                        SecurityScheme()
+                            .type(SecurityScheme.Type.HTTP)
+                            .scheme("bearer")
+                            .bearerFormat("JWT")
+                            .description("Enter your JWT token obtained from /api/v1/auth/login or /api/v1/auth/signup"),
+                    ),
+            )
 
     private fun apiInfo(): Info =
         Info()
@@ -44,8 +57,16 @@ class OpenApiConfig {
                 - HTML rendering and publishing
 
                 ## Authentication
-                Currently, this API does not require authentication.
-                In production, you should implement proper authentication and authorization.
+                This API uses JWT (JSON Web Token) Bearer authentication.
+                
+                ### How to authenticate:
+                1. **Sign up**: POST to `/api/v1/auth/signup` with your credentials
+                2. **Login**: POST to `/api/v1/auth/login` to get your access token
+                3. **Use Token**: Click the 🔓 Authorize button and enter: your token
+                4. All protected endpoints will now include your JWT token automatically
+                
+                ### Token Format
+                The token should be entered as-is (without "Bearer " prefix) in the Authorize dialog.
 
                 ## Multi-tenant Access
                 - **Admin API**: Use `/api/v1/tenants/*` endpoints to manage tenants

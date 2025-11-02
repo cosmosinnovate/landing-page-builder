@@ -45,6 +45,7 @@ class SecurityConfig(
                 auth
                     // Public endpoints
                     .requestMatchers("/api/v1/auth/**").permitAll()
+                    .requestMatchers("/health").permitAll()
                     .requestMatchers("/public/**").permitAll()
                     .requestMatchers("/error").permitAll()
                     .requestMatchers("/api-docs/**").permitAll()

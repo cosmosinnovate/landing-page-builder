@@ -13,10 +13,12 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/tenants")
 @Tag(name = "Tenant Management", description = "APIs for managing tenants in the multi-tenant system")
+@SecurityRequirement(name = "Bearer Authentication")
 class TenantController(
     private val tenantService: TenantService,
 ) {
@@ -43,6 +46,7 @@ class TenantController(
         ],
     )
     @PostMapping
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN')")
     suspend fun createTenant(
         @Valid @RequestBody request: CreateTenantRequest,
     ): ResponseEntity<TenantResponse> {
@@ -60,6 +64,7 @@ class TenantController(
         ],
     )
     @GetMapping("/{tenantId}")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN') or hasRole('EDITOR')")
     suspend fun getTenantById(
         @Parameter(description = "Tenant ID") @PathVariable tenantId: String,
     ): ResponseEntity<TenantResponse> {
@@ -76,6 +81,7 @@ class TenantController(
         ],
     )
     @GetMapping("/subdomain/{subdomain}")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN') or hasRole('EDITOR')")
     suspend fun getTenantBySubdomain(
         @Parameter(description = "Tenant subdomain") @PathVariable subdomain: String,
     ): ResponseEntity<TenantResponse> {
@@ -92,6 +98,7 @@ class TenantController(
         ],
     )
     @GetMapping("/domain/{customDomain}")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN') or hasRole('EDITOR')")
     suspend fun getTenantByCustomDomain(
         @Parameter(description = "Custom domain") @PathVariable customDomain: String,
     ): ResponseEntity<TenantResponse> {
@@ -110,6 +117,7 @@ class TenantController(
         ],
     )
     @PutMapping("/{tenantId}")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN') or hasRole('EDITOR')")
     suspend fun updateTenant(
         @Parameter(description = "Tenant ID") @PathVariable tenantId: String,
         @Valid @RequestBody request: UpdateTenantRequest,
@@ -131,6 +139,7 @@ class TenantController(
         ],
     )
     @PatchMapping("/{tenantId}/status")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN') or hasRole('EDITOR')")
     suspend fun updateTenantStatus(
         @Parameter(description = "Tenant ID") @PathVariable tenantId: String,
         @Valid @RequestBody request: TenantStatusUpdateRequest,
@@ -148,6 +157,7 @@ class TenantController(
         ],
     )
     @PatchMapping("/{tenantId}/activate")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN') or hasRole('EDITOR')")
     suspend fun activateTenant(
         @Parameter(description = "Tenant ID") @PathVariable tenantId: String,
     ): ResponseEntity<TenantResponse> {
@@ -165,6 +175,7 @@ class TenantController(
         ],
     )
     @PatchMapping("/{tenantId}/suspend")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN')")
     suspend fun suspendTenant(
         @Parameter(description = "Tenant ID") @PathVariable tenantId: String,
         @Parameter(description = "Reason for suspension") @RequestParam(required = false) reason: String?,
@@ -183,6 +194,7 @@ class TenantController(
         ],
     )
     @DeleteMapping("/{tenantId}")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN')")
     suspend fun deleteTenant(
         @Parameter(description = "Tenant ID") @PathVariable tenantId: String,
     ): ResponseEntity<Void> {
@@ -197,6 +209,7 @@ class TenantController(
         ],
     )
     @GetMapping("/status/{status}")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN') or hasRole('EDITOR')")
     suspend fun getTenantsByStatus(
         @Parameter(description = "Tenant status") @PathVariable status: TenantStatus,
     ): ResponseEntity<List<TenantResponse>> {
@@ -212,6 +225,7 @@ class TenantController(
         ],
     )
     @GetMapping("/active")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN') or hasRole('EDITOR')")
     suspend fun getActiveTenants(): ResponseEntity<List<TenantResponse>> {
         val tenants = tenantService.findActiveTenants()
         val response = TenantMapper.toResponseList(tenants)
@@ -225,6 +239,7 @@ class TenantController(
         ],
     )
     @GetMapping("/subdomain/{subdomain}/availability")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN') or hasRole('EDITOR')")
     suspend fun checkSubdomainAvailability(
         @Parameter(description = "Subdomain to check") @PathVariable subdomain: String,
     ): ResponseEntity<SubdomainAvailabilityResponse> {
@@ -240,6 +255,7 @@ class TenantController(
         ],
     )
     @GetMapping("/summary")
+    @PreAuthorize("hasRole('OWNER') or hasRole('ADMIN') or hasRole('EDITOR')")
     suspend fun getTenantSummary(): ResponseEntity<TenantSummaryResponse> {
         val activeCount = tenantService.countTenantsByStatus(TenantStatus.ACTIVE)
         val suspendedCount = tenantService.countTenantsByStatus(TenantStatus.SUSPENDED)
